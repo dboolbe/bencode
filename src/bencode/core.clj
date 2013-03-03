@@ -48,6 +48,9 @@
                                      (number? (mydic (nth (keys mydic) cnt))) (str ndic (bstring (nth (keys mydic) cnt)) (bint (mydic (nth (keys mydic) cnt))))
                                      :else  (str ndic (bstring (nth (keys mydic) cnt)) (bstring (mydic (nth (keys mydic) cnt)))))))))
 
+;; NOTE: Not my function
+;; http://stackoverflow.com/questions/2640169/whats-the-easiest-way-to-parse-numbers-in-clojure
+;; Owner: solussd
 (defn parse-number
   "Reads a number from a string. Returns nil if not a number."
   [s]
@@ -170,5 +173,22 @@
                   ;;(println "String:" mydic (+ cnt (bdint-cnt substr1)) (bdstring substr0) (bdstring substr1) (+ cnt (bdstring-cnt substr0) (bdint-cnt substr1)))
                   (recur mydic (+ cnt (bdstring-cnt substr0) (bdstring-cnt substr1)) (assoc nmap (bdstring substr0) (bdstring substr1)))))))) nmap)))
 
+(defn encode
+  [object]
+  (cond
+    (map? object) (bdic object)
+    (list? object) (blist object)
+    (string? object) (bstring object)
+    (number? object) (bint object)
+    :else (throw (Exception. "UnsupportedDataType"))))
 
-
+(defn decode
+  [object]
+  (if (string? object)
+    (let [keyindex (subs object 0 1)]
+      (cond
+        (= keyindex "d") (bddic object)
+        (= keyindex "l") (bdlist object)
+        (= keyindex "i") (bdint object)
+        :else (bdstring object)))
+    (throw (Exception. "InvalidDataType"))))
